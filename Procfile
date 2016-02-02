@@ -1,1 +1,1 @@
-web: unicorn flask_scrabble:app
+web: gunicorn flask_scrabble:app
