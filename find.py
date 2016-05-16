@@ -12,38 +12,43 @@ import re  # (added after class ... regular expression package)
 
 def search(f, pattern, tray):
     results = [ ]
+    pattern = fixpat(pattern)
+    dfa = re.compile(pattern)
     for word in f:
         word = word.strip()
-        if matches(word, pattern, tray):
+        if matches(word, dfa, pattern, tray):
             results.append(word)
     return results
 
-def matches(word, pattern, tray):
+def matches(word, dfa, pattern, tray):
     """
     Word matches pattern with tray.
     Returns True if the word can be made from the
     letters in the tray and pattern, and if it also
     matches the pattern (see matchpat).
     """
-    return matchpat(word, pattern) and made_from(word, pattern+tray)
+    return matchpat(word, dfa) and made_from(word, pattern+tray)
 
 def made_from(word, letters):
     bag = letterbag.LetterBag(letters)
     return bag.contains(word)
 
-def matchpat(word, pattern):
+def matchpat(word, dfa):
     """
     A letter x matches that letter.
+    FIXME now uses regular expressions
     - (hyphen) matches any letter
     _ (underscore) matches any sequence of letters
     if X matches A, and Y matches B, then
     XY matches AB.
     For example '_ch-s' matches 'branches' but not 'branchings'
     """
+    return dfa.fullmatch(word)
+
+def fixpat(pattern):
     pat = re.sub("_", ".+", pattern)
     pat = re.sub("-", ".", pat)
-    return re.fullmatch(pat, word)
-
+    return pat
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
